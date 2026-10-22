@@ -39,6 +39,7 @@ class ChallengeIn(BaseModel):
     is_published: bool = False
 
 class ChallengeOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     title: str
     description: str
