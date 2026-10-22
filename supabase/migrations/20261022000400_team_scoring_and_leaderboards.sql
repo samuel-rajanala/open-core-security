@@ -22,17 +22,9 @@ create index if not exists team_members_team_id_idx on public.team_members(team_
 alter table public.teams enable row level security;
 alter table public.team_members enable row level security;
 
-drop policy if exists "Authenticated users can view teams" on public.teams;
-create policy "Authenticated users can view teams"
-  on public.teams for select to authenticated using (true);
-
-drop policy if exists "Members can view team membership" on public.team_members;
-create policy "Members can view team membership"
-  on public.team_members for select to authenticated using (true);
-
-revoke insert, update, delete on public.teams from anon, authenticated;
-revoke insert, update, delete on public.team_members from anon, authenticated;
-grant select on public.teams, public.team_members to authenticated;
+-- No direct table reads: invite codes and membership rows are returned only
+-- through narrowly scoped RPCs, never through broad table SELECT grants.
+revoke all on public.teams, public.team_members from anon, authenticated;
 
 create or replace function public.create_team(p_name text)
 returns jsonb
@@ -82,6 +74,26 @@ $$;
 
 -- Only verified successful submissions contribute points. Failed attempts remain
 -- visible to administrators but never affect either leaderboard.
+
+create or replace function public.get_my_team()
+returns jsonb
+language sql
+stable
+security definer
+set search_path = ''
+as $
+  select jsonb_build_object(
+    'id', t.id,
+    'name', t.name,
+    'invite_code', t.invite_code,
+    'joined_at', tm.joined_at
+  )
+  from public.team_members tm
+  join public.teams t on t.id = tm.team_id
+  where tm.user_id = auth.uid()
+  limit 1;
+$;
+
 create or replace function public.get_individual_leaderboard()
 returns table (
   user_id uuid,
@@ -159,12 +171,12 @@ begin
 end;
 $$;
 
-revoke all on function public.create_team(text) from public, anon;
+revoke all on function public.create_team(text) from public, anon;\nrevoke all on function public.get_my_team() from public, anon;
 revoke all on function public.join_team(text) from public, anon;
 revoke all on function public.get_individual_leaderboard() from public, anon;
 revoke all on function public.get_team_leaderboard() from public, anon;
 revoke all on function public.get_admin_scoring_data() from public, anon;
-grant execute on function public.create_team(text) to authenticated;
+grant execute on function public.create_team(text) to authenticated;\ngrant execute on function public.get_my_team() to authenticated;
 grant execute on function public.join_team(text) to authenticated;
 grant execute on function public.get_individual_leaderboard() to authenticated;
 grant execute on function public.get_team_leaderboard() to authenticated;
