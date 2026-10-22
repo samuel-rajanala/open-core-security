@@ -4,6 +4,11 @@ import { CHALLENGE_LABS } from "../data/challengeLabs.js";
 import { ArrowUpRight, CheckCircle2, Code2, LockKeyhole, Send, X, Search, Filter, BookOpen } from "lucide-react";
 
 const difficultyLabel = (value) => ({ beginner: "Easy", intermediate: "Medium", advanced: "Hard" }[String(value || "").toLowerCase()] || value || "Practice");
+const normalizeTitle = (value) => String(value || "").normalize("NFKC").trim().replace(/\\s+/g, " ").toLocaleLowerCase();
+const getLabForChallenge = (title) => {
+  const wanted = normalizeTitle(title);
+  return Object.entries(CHALLENGE_LABS).find(([labTitle]) => normalizeTitle(labTitle) === wanted)?.[1] || null;
+};
 
 export default function ChallengeBoard() {
   const [items, setItems] = useState([]);
@@ -37,7 +42,7 @@ export default function ChallengeBoard() {
     return matchesDifficulty && text.includes(search.toLowerCase().trim());
   }), [items, difficulty, search]);
 
-  const lab = active ? CHALLENGE_LABS[active.title] : null;
+  // Match titles defensively: database text can contain extra whitespace or Unicode variants.\n  const lab = active ? getLabForChallenge(active.title) : null;
 
   async function submitFlag(event) {
     event.preventDefault();
@@ -97,12 +102,12 @@ export default function ChallengeBoard() {
         <p>{active.description}</p>
         <div className="lab-instructions">
           <h3><Code2 size={17}/> Your task</h3>
-          <p>{lab?.task || "Review the scenario and identify the security issue. Submit the challenge flag when you have solved it."}</p>
+          <p>{lab ? lab.task : "This challenge scenario is not configured yet. Please contact the Open Core Security team."}</p>
           <div className="lab-response">
             <div className="lab-response-head"><span><LockKeyhole size={14}/> SIMULATED EVIDENCE</span><span>LOCAL EXERCISE</span></div>
-            <pre>{lab?.evidence || "No lab evidence has been configured for this challenge yet."}</pre>
+            <pre>{lab ? lab.evidence : "Scenario unavailable — challenge title did not match a configured lab."}</pre>
           </div>
-          <p className="lab-hint">{lab?.hint || "Review the evidence and submit the flag in OCS{...} format."}</p>
+          <p className="lab-hint">{lab ? lab.hint : "Please do not guess a flag. Contact the challenge administrator so this lab can be configured."}</p>
         </div>
         <form className="flag-submit-form" onSubmit={submitFlag}>
           <label htmlFor="challenge-flag">Submit your flag</label>
