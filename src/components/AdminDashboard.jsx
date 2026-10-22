@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabase";
+import ChallengeManager from "./ChallengeManager.jsx";
 import { ShieldCheck, Users, Inbox, RefreshCw, Search, AlertCircle } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -79,12 +80,14 @@ export default function AdminDashboard() {
           <button className={tab === "overview" ? "active" : ""} onClick={() => setTab("overview")}>Overview</button>
           <button className={tab === "members" ? "active" : ""} onClick={() => setTab("members")}>Members ({members.length})</button>
           <button className={tab === "inbox" ? "active" : ""} onClick={() => setTab("inbox")}>Inbox ({messages.length})</button>
+          <button className={tab === "challenges" ? "active" : ""} onClick={() => setTab("challenges")}>Challenges</button>
         </div>
         {tab === "overview" && <div className="admin-columns">
           <article className="admin-panel"><h3>Recent members</h3>{members.slice(0,5).map(m=><div className="admin-list-row" key={m.id}><span>{m.display_name || "Unnamed member"}<small>{m.id}</small></span><b>{m.role}</b></div>)}{!members.length && <p>No profiles found.</p>}</article>
           <article className="admin-panel"><h3>Latest messages</h3>{messages.slice(0,5).map(m=><div className="admin-list-row" key={m.id}><span>{m.subject}<small>{m.name} · {m.email}</small></span><time>{new Date(m.created_at).toLocaleDateString()}</time></div>)}{!messages.length && <p>No messages yet.</p>}</article>
         </div>}
         {tab === "members" && <article className="admin-panel"><div className="admin-panel-head"><h3>Member directory</h3><label className="admin-search"><Search size={15}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search name, ID, or role"/></label></div><div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Display name</th><th>Role</th><th>Joined</th><th>User ID</th></tr></thead><tbody>{filteredMembers.map(m=><tr key={m.id}><td>{m.display_name}</td><td><span className={m.role === "admin" ? "admin-role" : "member-role"}>{m.role}</span></td><td>{new Date(m.created_at).toLocaleDateString()}</td><td><code>{m.id}</code></td></tr>)}</tbody></table>{!filteredMembers.length && <p>No matching members.</p>}</div></article>}
+        {tab === "challenges" && <ChallengeManager />}
         {tab === "inbox" && <div className="admin-inbox">{messages.map(m=><article className="admin-panel message-card" key={m.id}><div className="message-meta"><span>{m.name} · <a href={`mailto:${encodeURIComponent(m.email)}`}>{m.email}</a></span><time>{new Date(m.created_at).toLocaleString()}</time></div><h3>{m.subject}</h3><p>{m.message}</p></article>)}{!messages.length && <article className="admin-panel">Your inbox is empty.</article>}</div>}
         <p className="admin-footnote">Member management is read-only in this release. Role changes and account deletion are intentionally not exposed in the browser.</p>
       </>}
