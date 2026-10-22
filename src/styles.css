@@ -194,3 +194,26 @@
 .lab-debrief h3{display:flex;align-items:center;gap:8px;margin:0 0 9px;color:#b6f36b;font-size:13px}
 .lab-debrief p{margin:0;color:#c4d1c5;font-size:12px;line-height:1.75}
 @media(max-width:700px){.challenge-library-toolbar{align-items:stretch}.challenge-search{width:100%}.challenge-difficulty-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.challenge-difficulty-filters button{justify-content:space-between}}
+
+
+/* Protected answer key shown only after the server verifies an administrator session. */
+.admin-solution-panel {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(167, 139, 250, .45);
+  border-radius: 16px;
+  background: rgba(124, 58, 237, .09);
+}
+.admin-solution-panel h3 { margin: .35rem 0 1rem; }
+.admin-solution-panel p { margin: .65rem 0; }
+.admin-solution-panel ol { padding-left: 1.35rem; }
+.admin-solution-panel li { margin: .45rem 0; }
+.admin-solution-flag {
+  display: block;
+  overflow-wrap: anywhere;
+  padding: .85rem 1rem;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, .28);
+  color: #c4b5fd;
+  user-select: text;
+}
