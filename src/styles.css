@@ -174,3 +174,23 @@
 .challenge-home-cta p{font-size:12px;color:#98a49a;line-height:1.7;margin:0;max-width:590px}
 .challenge-home-cta .btn{flex-shrink:0}
 @media(max-width:700px){.challenges-hero{padding:60px 0 35px}.challenges-trust{font-size:8px;flex-wrap:wrap}.challenges-page .header{width:calc(100% - 38px)}.challenges-nav{display:flex;gap:15px}.challenges-nav a{font-size:10px}.challenge-home-cta{align-items:flex-start;flex-direction:column;padding-block:40px}.challenge-home-cta .btn{width:100%}}
+
+
+/* Challenge library filters and lab debrief */
+.challenge-library-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:25px 0 20px;flex-wrap:wrap}
+.challenge-search{display:flex;align-items:center;gap:9px;width:min(330px,100%);min-height:42px;padding:0 12px;border:1px solid #354137;color:#91a095}
+.challenge-search input{width:100%;min-width:0;background:transparent;border:0;outline:0;color:#edf4ee;font:11px Manrope}
+.challenge-difficulty-filters{display:flex;gap:6px;flex-wrap:wrap}
+.challenge-difficulty-filters button{display:flex;align-items:center;gap:8px;padding:9px 12px;background:transparent;border:1px solid #354137;color:#a5b1a6;font-size:10px;cursor:pointer}
+.challenge-difficulty-filters button.active,.challenge-difficulty-filters button:hover{border-color:#6c8c51;color:var(--green);background:#121b12}
+.challenge-difficulty-filters button span{font:8px var(--mono);color:#78877b}
+.challenge-card-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font:8px var(--mono);letter-spacing:.06em;color:#8c9a8e;text-transform:uppercase}
+.challenge-card-meta b{font-weight:500;padding:4px 6px;border:1px solid #43513f;color:#b6c4b7}
+.challenge-card-meta .difficulty-beginner{border-color:#526c42;color:#b6f36b}
+.challenge-card-meta .difficulty-intermediate{border-color:#7b673a;color:#e5c47b}
+.challenge-card-meta .difficulty-advanced{border-color:#81504a;color:#f0a39a}
+.challenge-board-card h3{margin-top:17px}
+.lab-debrief{margin-top:17px;padding:16px;border:1px solid #526c42;background:#111b12}
+.lab-debrief h3{display:flex;align-items:center;gap:8px;margin:0 0 9px;color:#b6f36b;font-size:13px}
+.lab-debrief p{margin:0;color:#c4d1c5;font-size:12px;line-height:1.75}
+@media(max-width:700px){.challenge-library-toolbar{align-items:stretch}.challenge-search{width:100%}.challenge-difficulty-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.challenge-difficulty-filters button{justify-content:space-between}}
