@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import CommunityPortal from "./components/CommunityPortal.jsx";
 import AdminDashboard from "./components/AdminDashboard.jsx";
 import { ArrowDown, ArrowRight, ArrowUpRight, Menu, X, Shield, Terminal, Crosshair, Flag, Code2, Search, LockKeyhole, Network, Bug, Github, Mail, CheckCircle2, CalendarDays, Zap, ExternalLink } from "lucide-react";
@@ -14,6 +14,18 @@ const domains = [
 
 export default function App(){
  const [menu,setMenu]=useState(false),[level,setLevel]=useState("All"),[query,setQuery]=useState(""),[copied,setCopied]=useState(false);
+ useEffect(()=>{
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const nodes=[...document.querySelectorAll(".hero-grid,.metrics,.two-col,.event-card,.domain,.challenge-home-cta,.portal-panel,.community-grid")];
+  nodes.forEach((node,index)=>{node.setAttribute("data-reveal","");node.style.setProperty("--reveal-delay",`${(index%3)*75}ms`);});
+  document.documentElement.classList.add("reveal-ready");
+  if(!("IntersectionObserver" in window)){nodes.forEach(node=>node.classList.add("is-visible"));return;}
+  const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
+   if(entry.isIntersecting){entry.target.classList.add("is-visible");observer.unobserve(entry.target);}
+  }),{threshold:.12,rootMargin:"0px 0px -35px 0px"});
+  nodes.forEach(node=>observer.observe(node));
+  return()=>observer.disconnect();
+ },[]);
  const visible=useMemo(()=>domains.filter(d=>(level==="All"||d.level.toLowerCase().includes(level.toLowerCase()))&&(d.name+" "+d.description).toLowerCase().includes(query.toLowerCase())),[level,query]);
  async function copyEmail(){try{await navigator.clipboard.writeText("samuelrajanala@gmail.com");setCopied(true);setTimeout(()=>setCopied(false),1800)}catch{location.href="mailto:samuelrajanala@gmail.com"}}
  const close=()=>setMenu(false);
