@@ -31,7 +31,7 @@ returns jsonb
 language plpgsql
 security definer
 set search_path = ''
-as $$
+as $fn$
 declare
   v_user uuid := auth.uid();
   v_team public.teams;
@@ -48,14 +48,14 @@ begin
   insert into public.team_members(user_id, team_id) values (v_user, v_team.id);
   return jsonb_build_object('id', v_team.id, 'name', v_team.name, 'invite_code', v_team.invite_code);
 end;
-$$;
+$fn$;
 
 create or replace function public.join_team(p_invite_code text)
 returns jsonb
 language plpgsql
 security definer
 set search_path = ''
-as $$
+as $fn$
 declare
   v_user uuid := auth.uid();
   v_team public.teams;
@@ -70,7 +70,7 @@ begin
   insert into public.team_members(user_id, team_id) values (v_user, v_team.id);
   return jsonb_build_object('id', v_team.id, 'name', v_team.name);
 end;
-$$;
+$fn$;
 
 -- Only verified successful submissions contribute points. Failed attempts remain
 -- visible to administrators but never affect either leaderboard.
@@ -81,7 +81,7 @@ language sql
 stable
 security definer
 set search_path = ''
-as $$
+as $fn$
   select jsonb_build_object(
     'id', t.id,
     'name', t.name,
@@ -92,7 +92,7 @@ as $$
   join public.teams t on t.id = tm.team_id
   where tm.user_id = auth.uid()
   limit 1;
-$$;
+$fn$;
 
 create or replace function public.get_individual_leaderboard()
 returns table (
@@ -105,7 +105,7 @@ language sql
 stable
 security definer
 set search_path = ''
-as $$
+as $fn$
   select p.id, coalesce(p.display_name, 'Unnamed member'),
          coalesce(sum(s.points_awarded) filter (where s.is_correct), 0)::bigint,
          count(*) filter (where s.is_correct)::bigint
@@ -115,7 +115,7 @@ as $$
   group by p.id, p.display_name
   order by 3 desc, 4 desc, 2 asc
   limit 100;
-$$;
+$fn$;
 
 create or replace function public.get_team_leaderboard()
 returns table (
@@ -129,7 +129,7 @@ language sql
 stable
 security definer
 set search_path = ''
-as $$
+as $fn$
   select t.id, t.name,
          coalesce(sum(s.points_awarded) filter (where s.is_correct), 0)::bigint,
          count(*) filter (where s.is_correct)::bigint,
@@ -140,7 +140,7 @@ as $$
   group by t.id, t.name
   order by 3 desc, 4 desc, 2 asc
   limit 100;
-$$;
+$fn$;
 
 create or replace function public.get_admin_scoring_data()
 returns jsonb
@@ -148,7 +148,7 @@ language plpgsql
 stable
 security definer
 set search_path = ''
-as $$
+as $fn$
 begin
   if not exists (
     select 1 from public.profiles
@@ -169,7 +169,7 @@ begin
     'team_memberships', (select count(*) from public.team_members)
   );
 end;
-$$;
+$fn$;
 
 revoke all on function public.create_team(text) from public, anon;
 revoke all on function public.get_my_team() from public, anon;
