@@ -1,31 +1,25 @@
 # Open Core Security
 
-A responsive React + Vite website for an independent, community-driven cybersecurity initiative.
+A responsive React + Vite website and FastAPI backend for an independent, community-driven cybersecurity initiative.
 
-## Included
-- Responsive landing page and mobile navigation
-- About and community principles
-- Proposed CTF event showcase (clearly marked as not scheduled)
-- Searchable and filterable cybersecurity domains
-- Organizer contact action and GitHub profile link
-- GitHub Pages deployment workflow
+## Frontend
+```bash
+npm install
+npm run dev
+npm run build
+```
 
-## Run locally
-Requires Node.js 18+.
+## Backend
+See [backend/README.md](backend/README.md) for local setup, API documentation, and Render deployment.
 
-1. Run npm install
-2. Run npm run dev
-3. Open the local URL printed by Vite.
+The backend provides member accounts, contact-message storage, CTF challenge management and flag submissions, leaderboard scoring, announcements, and admin-only management endpoints. It runs separately from GitHub Pages and requires an API host and PostgreSQL for production.
 
-## Build
-Run npm run build. The production site is generated in dist/.
+## GitHub Pages
+Settings → Pages → Source: GitHub Actions. The included workflow publishes the Vite `dist/` directory.
 
-## Deploy to GitHub Pages
-1. In the repository, open Settings → Pages.
-2. Select GitHub Actions as the deployment source.
-3. Push to main. The included workflow builds and publishes the site.
-
-## Before publishing
-Review the organizer contact details in src/App.jsx. Operation: Blackout is a proposed concept, not a scheduled or open event. Publish dates, rules, challenge content, and registration only after they are finalized.
-
-The current site is a frontend only. It does not yet store registrations, run CTF challenges, validate flags, or provide a live leaderboard.
+## Security and status
+- Passwords are hashed with Argon2id; API sessions use expiring JWTs.
+- Challenge flags are stored as SHA-256 hashes and never exposed in API responses.
+- Admin routes require an admin bearer token.
+- Operation: Blackout remains a proposed concept, not a scheduled or open event.
+- Before public launch, configure rate limiting, database backups, migrations, and review deployment environment variables.
