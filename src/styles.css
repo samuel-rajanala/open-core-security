@@ -217,3 +217,25 @@
   color: #c4b5fd;
   user-select: text;
 }
+
+
+/* Team hub and scoring */
+.team-hub{margin-top:28px;padding-top:25px;border-top:1px solid var(--line)}
+.team-hub-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:18px}
+.team-hub-head h3{display:flex;align-items:center;gap:9px;font-size:23px;margin:10px 0 6px}
+.team-hub-head h3 svg,.team-leaderboards h4 svg{color:var(--green)}
+.team-hub-head p{font-size:11px;line-height:1.7;color:#91a095;margin:0}
+.team-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.team-actions form{display:grid;gap:12px;padding:18px;border:1px solid #354137;background:#101711}
+.team-actions label{display:grid;gap:7px;font:9px var(--mono);color:#a4b1a5}
+.team-actions input{width:100%;background:#090e0b;border:1px solid #354137;color:#e9eee9;padding:11px 12px;font:11px Manrope}
+.team-current{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:18px;border:1px solid #526c42;background:#121c13;margin-bottom:18px}
+.team-current>div{display:grid;gap:7px}
+.team-current small,.team-invite small{font:8px var(--mono);letter-spacing:.12em;color:#91a58e}
+.team-current strong{font-size:19px;color:var(--green)}
+.team-current span{font-size:10px;color:#9ba99b}
+.team-invite{justify-items:start}
+.team-invite code{font:16px var(--mono);letter-spacing:.12em;color:#e2f5d1}
+.team-leaderboards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.team-leaderboards h4{display:flex;align-items:center;gap:8px;font-size:14px;margin:0 0 14px}
+@media(max-width:700px){.team-hub-head{align-items:flex-start;flex-direction:column}.team-actions,.team-leaderboards{grid-template-columns:1fr}.team-current{align-items:flex-start;flex-direction:column}.team-invite{width:100%}}
