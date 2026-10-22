@@ -40,7 +40,7 @@ def register(data: RegisterIn, db: Session = Depends(get_db)):
     email = str(data.email).lower()
     if db.query(User).filter(func.lower(User.email) == email).first():
         raise HTTPException(409, "An account with this email already exists")
-    user = User(name=data.name.strip(), email=email, password_hash=hash_password(data.password))
+    user = User(name=data.name.strip(), email=email, password_hash=hash_password(data.password), role="admin" if settings.bootstrap_admin_email and email == settings.bootstrap_admin_email.lower() else "member")
     db.add(user)
     try:
         db.commit()
