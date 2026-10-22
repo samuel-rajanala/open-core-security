@@ -49,7 +49,10 @@ export default function CommunityPortal() {
         const { data, error } = await supabase.auth.signUp({
           email: authForm.email.trim(),
           password: authForm.password,
-          options: { data: { display_name: authForm.name.trim() } },
+          options: {
+            data: { display_name: authForm.name.trim() },
+            emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}`,
+          },
         });
         if (error) throw error;
         setNotice(data.session
