@@ -89,7 +89,7 @@ export default function CommunityPortal() {
 
   return <section className="portal" id="portal">
     <div className="wrap">
-      <div className="kicker">05 / COMMUNITY PORTAL</div>
+      <div className="kicker">04 / COMMUNITY PORTAL</div>
       <div className="portal-heading">
         <div><h2>Get connected. <em>Get involved.</em></h2><p>Join the community or send the organizers a message.</p></div>
         {session && <div className="portal-user"><span>{profile?.role === "admin" ? <ShieldCheck size={15}/> : null}{profile?.display_name || session.user.email}</span><button className="portal-secondary" onClick={signOut} disabled={busy}><LogOut size={14}/> Sign out</button></div>}
