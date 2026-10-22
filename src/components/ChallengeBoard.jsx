@@ -4,7 +4,7 @@ import { CHALLENGE_LABS } from "../data/challengeLabs.js";
 import { ArrowUpRight, CheckCircle2, Code2, LockKeyhole, Send, X, Search, Filter, BookOpen } from "lucide-react";
 
 const difficultyLabel = (value) => ({ beginner: "Easy", intermediate: "Medium", advanced: "Hard" }[String(value || "").toLowerCase()] || value || "Practice");
-const normalizeTitle = (value) => String(value || "").normalize("NFKC").trim().replace(/\\s+/g, " ").toLocaleLowerCase();
+const normalizeTitle = (value) => String(value || "").normalize("NFKC").trim().replace(/\s+/g, " ").toLocaleLowerCase();
 const getLabForChallenge = (title) => {
   const wanted = normalizeTitle(title);
   return Object.entries(CHALLENGE_LABS).find(([labTitle]) => normalizeTitle(labTitle) === wanted)?.[1] || null;
@@ -42,7 +42,8 @@ export default function ChallengeBoard() {
     return matchesDifficulty && text.includes(search.toLowerCase().trim());
   }), [items, difficulty, search]);
 
-  // Match titles defensively: database text can contain extra whitespace or Unicode variants.\n  const lab = active ? getLabForChallenge(active.title) : null;
+  // Match titles defensively: database text can contain extra whitespace or Unicode variants.
+  const lab = active ? getLabForChallenge(active.title) : null;
 
   async function submitFlag(event) {
     event.preventDefault();
