@@ -171,12 +171,14 @@ begin
 end;
 $$;
 
-revoke all on function public.create_team(text) from public, anon;\nrevoke all on function public.get_my_team() from public, anon;
+revoke all on function public.create_team(text) from public, anon;
+revoke all on function public.get_my_team() from public, anon;
 revoke all on function public.join_team(text) from public, anon;
 revoke all on function public.get_individual_leaderboard() from public, anon;
 revoke all on function public.get_team_leaderboard() from public, anon;
 revoke all on function public.get_admin_scoring_data() from public, anon;
-grant execute on function public.create_team(text) to authenticated;\ngrant execute on function public.get_my_team() to authenticated;
+grant execute on function public.create_team(text) to authenticated;
+grant execute on function public.get_my_team() to authenticated;
 grant execute on function public.join_team(text) to authenticated;
 grant execute on function public.get_individual_leaderboard() to authenticated;
 grant execute on function public.get_team_leaderboard() to authenticated;
