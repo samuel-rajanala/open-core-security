@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: open-core-security-api
+    runtime: docker
+    rootDir: backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://samuel-rajanala.github.io,http://localhost:5173
+      - key: BOOTSTRAP_ADMIN_EMAIL
+        sync: false
