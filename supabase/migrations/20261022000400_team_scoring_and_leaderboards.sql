@@ -81,7 +81,7 @@ language sql
 stable
 security definer
 set search_path = ''
-as $
+as $$
   select jsonb_build_object(
     'id', t.id,
     'name', t.name,
@@ -92,7 +92,7 @@ as $
   join public.teams t on t.id = tm.team_id
   where tm.user_id = auth.uid()
   limit 1;
-$;
+$$;
 
 create or replace function public.get_individual_leaderboard()
 returns table (
