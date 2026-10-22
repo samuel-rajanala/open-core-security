@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
   let body: { challenge_id?: string };
   try { body = await req.json(); } catch { return json({ error: "Invalid request body." }, 400); }
   if (typeof body.challenge_id !== "string" || !/^[0-9a-f-]{36}$/i.test(body.challenge_id)) return json({ error: "A valid challenge is required." }, 400);
-  const { data: solution, error } = await admin.from("private.challenge_solutions").select("flag, walkthrough, checklist").eq("challenge_id", body.challenge_id).maybeSingle();
+  const { data: solution, error } = await admin.rpc("get_admin_challenge_solution", { p_challenge_id: body.challenge_id });
   if (error) return json({ error: "Could not load the protected answer key." }, 500);
   if (!solution) return json({ error: "No answer key has been seeded for this challenge yet." }, 404);
   return json({ solution });
