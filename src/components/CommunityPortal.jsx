@@ -130,7 +130,7 @@ export default function CommunityPortal() {
         </div>
       </div>}
       {session && <TeamHub />}
-      {notice && <p className="portal-notice" role="status">{notice}</p>
+      {notice && <p className="portal-notice" role="status">{notice}</p>}
       <p className="portal-footnote">Use a unique password. Open Core Security will never ask you to share your password or authentication codes.</p>
     </div>
   </section>;
