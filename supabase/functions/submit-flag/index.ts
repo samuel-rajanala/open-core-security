@@ -93,17 +93,14 @@ Deno.serve(async (req) => {
   if (countError) return json({ error: "Could not check submission limits." }, 500);
   if ((count ?? 0) >= 10) return json({ error: "Attempt limit reached. Try again in an hour." }, 429);
 
-  const { data: stored, error: flagError } = await admin
-    .schema("private")
-    .from("challenge_flags")
-    .select("flag_hash")
-    .eq("challenge_id", challengeId)
-    .maybeSingle();
+  const { data: storedHash, error: flagError } = await admin.rpc("get_challenge_flag_hash", {
+    p_challenge_id: challengeId,
+  });
   if (flagError) return json({ error: "Could not validate the flag." }, 500);
-  if (!stored?.flag_hash) return json({ error: "This challenge is not ready for submissions yet." }, 503);
+  if (!storedHash) return json({ error: "This challenge is not ready for submissions yet." }, 503);
 
   const candidateHash = await sha256Hex(submittedFlag);
-  const expectedHash = String(stored.flag_hash).trim().toLowerCase();
+  const expectedHash = String(storedHash).trim().toLowerCase();
   const correct = /^[0-9a-f]{64}$/.test(expectedHash) && candidateHash === expectedHash;
   const pointsAwarded = correct ? Math.max(0, Number(challenge.points) || 0) : 0;
 
