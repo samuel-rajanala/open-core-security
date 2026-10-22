@@ -53,7 +53,7 @@ export default function ChallengeBoard() {
 
   return <section className="challenge-board" id="challenges">
     <div className="wrap">
-      <div className="kicker">04 / PRACTICAL LEARNING</div>
+      <div className="kicker">CHALLENGE LIBRARY</div>
       <h2>Community <em>challenges.</em></h2>
       <p>Practice security thinking with community-published exercises. Work only in systems you own or are authorized to assess.</p>
       {loading ? <p>Loading challenges...</p> : error ? <p role="alert">{error}</p> :
