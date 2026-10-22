@@ -66,8 +66,9 @@ export default function ChallengeManager() {
     setSaving(false);
     if (result.error) { setError(result.error.message); return; }
     if (!result.data) { setError("No row was changed. Check that your admin account has the required challenges-table policy."); return; }
-    setNotice(editingId ? "Challenge updated." : "Challenge created.");
+    const successMessage = editingId ? "Challenge updated." : "Challenge created.";
     resetForm();
+    setNotice(successMessage);
     await loadChallenges();
   }
 
