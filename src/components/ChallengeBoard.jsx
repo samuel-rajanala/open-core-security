@@ -20,6 +20,10 @@ export default function ChallengeBoard() {
   const [feedback, setFeedback] = useState(null);
   const [search, setSearch] = useState("");
   const [difficulty, setDifficulty] = useState("all");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminSolution, setAdminSolution] = useState(null);
+  const [solutionLoading, setSolutionLoading] = useState(false);
+  const [solutionError, setSolutionError] = useState("");
 
   useEffect(() => {
     let alive = true;
@@ -35,6 +39,33 @@ export default function ChallengeBoard() {
     load();
     return () => { alive = false; };
   }, []);
+
+  useEffect(() => {
+    let alive = true;
+    const checkAdmin = async (session) => {
+      if (!session?.user) { if (alive) setIsAdmin(false); return; }
+      const { data } = await supabase.from("profiles").select("role").eq("id", session.user.id).maybeSingle();
+      if (alive) setIsAdmin(data?.role === "admin");
+    };
+    supabase.auth.getSession().then(({ data }) => checkAdmin(data.session));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => { checkAdmin(session); });
+    return () => { alive = false; listener.subscription.unsubscribe(); };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    if (!active || !isAdmin) { setAdminSolution(null); setSolutionError(""); return; }
+    setSolutionLoading(true); setAdminSolution(null); setSolutionError("");
+    supabase.functions.invoke("get-admin-challenge-solution", { body: { challenge_id: active.id } })
+      .then(({ data, error }) => {
+        if (!alive) return;
+        if (error) setSolutionError(error.message || "Could not load the admin solution.");
+        else if (data?.solution) setAdminSolution(data.solution);
+        else setSolutionError(data?.error || "No solution is configured for this challenge.");
+      })
+      .finally(() => { if (alive) setSolutionLoading(false); });
+    return () => { alive = false; };
+  }, [active, isAdmin]);
 
   const visibleItems = useMemo(() => items.filter(item => {
     const matchesDifficulty = difficulty === "all" || item.difficulty === difficulty;
@@ -116,6 +147,15 @@ export default function ChallengeBoard() {
         </form>
         {feedback && <p className={`flag-feedback ${feedback.type}`} role="status">{feedback.type === "success" && <CheckCircle2 size={16}/>} {feedback.message}</p>}
         {feedback?.type === "success" && lab?.lesson && <div className="lab-debrief"><h3><BookOpen size={16}/> Learning notes</h3><p>{lab.lesson}</p></div>}
+        {isAdmin && <aside className="admin-solution-panel">
+          <div className="kicker">ADMIN ONLY · HIDDEN FROM PARTICIPANTS</div>
+          <h3>Answer key &amp; walkthrough</h3>
+          {solutionLoading ? <p>Loading protected solution…</p> : solutionError ? <p role="alert">{solutionError}</p> : adminSolution ? <>
+            <p><strong>Accepted flag</strong></p><code className="admin-solution-flag">{adminSolution.flag}</code>
+            <p><strong>How to find it</strong></p><p>{adminSolution.walkthrough}</p>
+            {adminSolution.checklist?.length > 0 && <ol>{adminSolution.checklist.map((step, index) => <li key={index}>{step}</li>)}</ol>}
+          </> : <p>Open a challenge to load its protected answer key.</p>}
+        </aside>}
         <p className="lab-safety-note">This is a simulated exercise, not a live website. No external systems are contacted.</p>
       </section>
     </div>}
