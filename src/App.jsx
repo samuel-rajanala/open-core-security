@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import CommunityPortal from "./components/CommunityPortal.jsx";
 import AdminDashboard from "./components/AdminDashboard.jsx";
+import PlanetScene from "./components/PlanetScene.jsx";
 import { ArrowDown, ArrowRight, ArrowUpRight, Menu, X, Shield, Terminal, Crosshair, Flag, Code2, Search, LockKeyhole, Network, Bug, Github, Mail, CheckCircle2, CalendarDays, Zap, ExternalLink } from "lucide-react";
 
 const domains = [
@@ -30,6 +31,7 @@ export default function App(){
  async function copyEmail(){try{await navigator.clipboard.writeText("samuelrajanala@gmail.com");setCopied(true);setTimeout(()=>setCopied(false),1800)}catch{location.href="mailto:samuelrajanala@gmail.com"}}
  const close=()=>setMenu(false);
  return <div className="site">
+  <PlanetScene />
   <div className="announcement"><i/> COMMUNITY-DRIVEN CYBERSECURITY <span>/</span> INDIA <b>LEARN BY DOING ↗</b></div>
   <header className="header"><a className="brand" href="#home" onClick={close}><span className="mark">✳</span><span>OPEN CORE<small>SECURITY</small></span></a><button className="mobile" onClick={()=>setMenu(!menu)} aria-label="Toggle menu">{menu?<X/>:<Menu/>}</button><nav className={menu?"nav open":"nav"}><a href="#about" onClick={close}>About</a><a href="#events" onClick={close}>CTF events</a><a href="#domains" onClick={close}>Domains</a><a href={`${import.meta.env.BASE_URL}challenges.html`} onClick={close}>Challenges ↗</a><a href="#community" onClick={close}>Community</a><a className="nav-cta" href="#community" onClick={close}>Get involved ↗</a></nav></header>
   <main>
