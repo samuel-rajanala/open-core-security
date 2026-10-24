@@ -81,27 +81,45 @@ export default function PlanetScene() {
         gltf => {
           if (disposed) return;
           const root = gltf.scene;
-          let mesh = null;
-          root.traverse(object => { if (!mesh && object.isMesh) mesh = object; });
-          if (!mesh) return;
-          mesh.geometry.computeBoundingSphere();
-          const modelRadius = mesh.geometry.boundingSphere?.radius || 1;
-          root.scale.setScalar(radius / modelRadius);
+
+          // Fit the complete scene, not its first mesh: GLB files often contain
+          // multiple meshes whose local origins are not at the planet center.
+          root.updateMatrixWorld(true);
+          const bounds = new THREE.Box3().setFromObject(root);
+          if (bounds.isEmpty()) {
+            console.warn("Planet model has no renderable bounds; keeping procedural globe.");
+            return;
+          }
+
+          const center = bounds.getCenter(new THREE.Vector3());
+          const size = bounds.getSize(new THREE.Vector3());
+          const maxDimension = Math.max(size.x, size.y, size.z);
+          if (!Number.isFinite(maxDimension) || maxDimension <= 0) {
+            console.warn("Planet model bounds are invalid; keeping procedural globe.");
+            return;
+          }
+
+          root.position.sub(center);
+          root.scale.multiplyScalar((radius * 2) / maxDimension);
+          root.updateMatrixWorld(true);
+
           root.traverse(object => {
-            if (object.isMesh) {
-              object.material = Array.isArray(object.material)
-                ? object.material.map(material => material.clone())
-                : object.material.clone();
-              const materials = Array.isArray(object.material) ? object.material : [object.material];
-              materials.forEach(material => {
-                if ("metalness" in material) material.metalness = 0;
-                if ("roughness" in material) material.roughness = 1;
-                material.transparent = false;
-                material.opacity = 1;
-                material.depthWrite = true;
-              });
-            }
+            if (!object.isMesh) return;
+            const materials = Array.isArray(object.material) ? object.material : [object.material];
+            object.material = materials.map(material => {
+              const copy = material.clone();
+              copy.transparent = false;
+              copy.opacity = 1;
+              copy.depthWrite = true;
+              if ("metalness" in copy) copy.metalness = 0;
+              if ("roughness" in copy) copy.roughness = 1;
+              return copy;
+            });
+            if (!Array.isArray(object.material)) object.material = object.material[0];
           });
+
+          // The textured model replaces the plain placeholder sphere only
+          // after its complete geometry has been normalized and centered.
           globeGroup.remove(fallback);
           globeGroup.add(root);
         },
