@@ -10,8 +10,8 @@ export default function PlanetScene() {
     (async () => {
       try {
         const THREE = await import("https://unpkg.com/three@0.143.0/build/three.module.js");
-        const { GLTFLoader } = await import("https://unpkg.com/three@0.143.0/examples/jsm/loaders/GLTFLoader.js");
-        const { DRACOLoader } = await import("https://unpkg.com/three@0.143.0/examples/jsm/loaders/DRACOLoader.js");
+        const { GLTFLoader } = await import("https://esm.sh/three@0.143.0/examples/jsm/loaders/GLTFLoader.js?bundle");
+        const { DRACOLoader } = await import("https://esm.sh/three@0.143.0/examples/jsm/loaders/DRACOLoader.js?bundle");
         if (disposed) return;
         const canvas = canvasRef.current;
         renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
