@@ -1,9 +1,11 @@
 import React from "react";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import ChallengeBoard from "./components/ChallengeBoard.jsx";
+import PlanetScene from "./components/PlanetScene.jsx";
 
 export default function ChallengesPage() {
   return <div className="site challenges-page">
+    <PlanetScene />
     <div className="announcement"><i/> COMMUNITY-DRIVEN CYBERSECURITY <span>/</span> INDIA <b>CONTROLLED LABS · LEARN BY DOING</b></div>
     <header className="header">
       <a className="brand" href={import.meta.env.BASE_URL}><span className="mark">✳</span><span>OPEN CORE<small>SECURITY</small></span></a>
