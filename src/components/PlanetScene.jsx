@@ -63,7 +63,7 @@ export default function PlanetScene() {
         moteGeo.setAttribute("position", new THREE.Float32BufferAttribute(motePos, 3));
         scene.add(new THREE.Points(moteGeo, new THREE.PointsMaterial({ color: 0x9fc4ff, size: .035, transparent: true, opacity: .5 })));
         const stops = (p, arr) => { for (let i = 1; i < arr.length; i++) if (p <= arr[i][0]) { const [p0,v0]=arr[i-1], [p1,v1]=arr[i]; let t=(p-p0)/(p1-p0); t=t*t*(3-2*t); return v0+(v1-v0)*t; } return arr.at(-1)[1]; };
-        const sx=[[0,0],[.32,-3.1],[.64,3.2],[1,0]], sy=[[0,-4.5],[.32,.55],[.64,.45],[1,.15]], ss=[[0,2.15],[.32,1],[.64,.92],[1,1.12]];
+        const sx=[[0,0],[.32,-3.1],[.64,3.2],[1,0]], sy=[[0,.05],[.32,.55],[.64,.45],[1,.15]], ss=[[0,1.18],[.32,1],[.64,.92],[1,1.12]];
         let last = performance.now(), spin = 0, currentX=0, currentY=-4.5, currentS=2.15;
         const resize = () => { camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); };
         window.addEventListener("resize", resize);
@@ -78,7 +78,7 @@ export default function PlanetScene() {
           currentY += (stops(p,sy)-currentY)*damp;
           currentS += (stops(p,ss)-currentS)*damp;
           spin += dt*.03;
-          world.position.set(currentX,currentY+(reduced?0:Math.max(0,1-now/1900)*-6.5),0);
+          world.position.set(currentX,currentY,0);
           world.scale.setScalar(currentS);
           globeGroup.rotation.y=2.07+spin+p*Math.PI*1.6;
           stars.rotation.y += reduced ? 0 : dt*.002;
