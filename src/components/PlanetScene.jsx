@@ -41,7 +41,7 @@ export default function PlanetScene() {
       globeGroup.rotation.z = 0.37;
       world.add(globeGroup);
 
-      const radius = 1.95;
+      const radius = 1.7;
       const fallback = new THREE.Mesh(
         new THREE.SphereGeometry(radius, 64, 64),
         new THREE.MeshPhongMaterial({ color: 0x173e72, shininess: 12, specular: 0x315e8d })
@@ -59,10 +59,10 @@ export default function PlanetScene() {
         texture => {
           if (disposed) { texture.dispose(); return; }
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-          texture.repeat.set(5, 5);
+          texture.repeat.set(1, 1);
           const clouds = new THREE.Mesh(
             new THREE.SphereGeometry(radius * 1.018, 64, 64),
-            new THREE.MeshStandardMaterial({ map: texture, transparent: true, opacity: 0.28, depthWrite: false })
+            new THREE.MeshStandardMaterial({ map: texture, transparent: true, opacity: 0.11, depthWrite: false })
           );
           globeGroup.add(clouds);
         },
@@ -96,6 +96,9 @@ export default function PlanetScene() {
               materials.forEach(material => {
                 if ("metalness" in material) material.metalness = 0;
                 if ("roughness" in material) material.roughness = 1;
+                material.transparent = false;
+                material.opacity = 1;
+                material.depthWrite = true;
               });
             }
           });
@@ -146,14 +149,14 @@ export default function PlanetScene() {
         return values[values.length - 1][1];
       };
 
-      const sx = [[0, 0], [0.32, -3.1], [0.64, 3.2], [1, 0]];
+      const sx = [[0, 0.65], [0.32, -2.5], [0.64, 2.7], [1, 0.35]];
       const sy = [[0, 0.05], [0.32, 0.55], [0.64, 0.45], [1, 0.15]];
-      const ss = [[0, 1.18], [0.32, 1], [0.64, 0.92], [1, 1.12]];
+      const ss = [[0, 0.98], [0.32, 0.88], [0.64, 0.82], [1, 0.94]];
       let last = performance.now();
       let spin = 0;
-      let currentX = 0;
+      let currentX = 0.65;
       let currentY = 0.05;
-      let currentS = 1.18;
+      let currentS = 0.98;
 
       resize = () => {
         camera.aspect = window.innerWidth / window.innerHeight;
