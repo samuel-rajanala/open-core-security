@@ -42,90 +42,40 @@ export default function PlanetScene() {
       world.add(globeGroup);
 
       const radius = 1.7;
+      // The Earth map is applied directly to the sphere as an equirectangular
+      // texture, so continents and oceans sit on the globe surface itself.
+      const earthMaterial = new THREE.MeshPhongMaterial({
+        color: 0xffffff,
+        shininess: 18,
+        specular: new THREE.Color(0x243b58)
+      });
       const fallback = new THREE.Mesh(
-        new THREE.SphereGeometry(radius, 64, 64),
-        new THREE.MeshPhongMaterial({ color: 0x173e72, shininess: 12, specular: 0x315e8d })
+        new THREE.SphereGeometry(radius, 128, 96),
+        earthMaterial
       );
       globeGroup.add(fallback);
+
+      new THREE.TextureLoader().load(
+        "https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg",
+        texture => {
+          if (disposed) { texture.dispose(); return; }
+          texture.encoding = THREE.sRGBEncoding;
+          texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+          earthMaterial.map = texture;
+          earthMaterial.color.set(0xffffff);
+          earthMaterial.needsUpdate = true;
+        },
+        undefined,
+        error => console.warn("Earth surface texture could not load; showing the blue fallback globe.", error)
+      );
       const halo = new THREE.Mesh(
         new THREE.SphereGeometry(radius * 1.13, 48, 48),
         new THREE.MeshBasicMaterial({ color: 0x3a6cff, transparent: true, opacity: 0.13, side: THREE.BackSide })
       );
       globeGroup.add(halo);
 
-      // Texture is optional and deliberately does not block the first render.
-      new THREE.TextureLoader().load(
-        BASE + "/planet-clouds.png",
-        texture => {
-          if (disposed) { texture.dispose(); return; }
-          texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-          texture.repeat.set(1, 1);
-          const clouds = new THREE.Mesh(
-            new THREE.SphereGeometry(radius * 1.018, 64, 64),
-            new THREE.MeshStandardMaterial({ map: texture, transparent: true, opacity: 0.11, depthWrite: false })
-          );
-          globeGroup.add(clouds);
-        },
-        undefined,
-        error => console.warn("Optional planet cloud texture could not load.", error)
-      );
-
-      // Load the detailed model independently; the fallback sphere stays up
-      // until the model is fully available.
-      draco = new DRACOLoader();
-      draco.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.5/");
-      const loader = new GLTFLoader();
-      loader.setDRACOLoader(draco);
-      loader.load(
-        BASE + "/planet.glb",
-        gltf => {
-          if (disposed) return;
-          const root = gltf.scene;
-
-          // Fit the complete scene, not its first mesh: GLB files often contain
-          // multiple meshes whose local origins are not at the planet center.
-          root.updateMatrixWorld(true);
-          const bounds = new THREE.Box3().setFromObject(root);
-          if (bounds.isEmpty()) {
-            console.warn("Planet model has no renderable bounds; keeping procedural globe.");
-            return;
-          }
-
-          const center = bounds.getCenter(new THREE.Vector3());
-          const size = bounds.getSize(new THREE.Vector3());
-          const maxDimension = Math.max(size.x, size.y, size.z);
-          if (!Number.isFinite(maxDimension) || maxDimension <= 0) {
-            console.warn("Planet model bounds are invalid; keeping procedural globe.");
-            return;
-          }
-
-          root.position.sub(center);
-          root.scale.multiplyScalar((radius * 2) / maxDimension);
-          root.updateMatrixWorld(true);
-
-          root.traverse(object => {
-            if (!object.isMesh) return;
-            const materials = Array.isArray(object.material) ? object.material : [object.material];
-            object.material = materials.map(material => {
-              const copy = material.clone();
-              copy.transparent = false;
-              copy.opacity = 1;
-              copy.depthWrite = true;
-              if ("metalness" in copy) copy.metalness = 0;
-              if ("roughness" in copy) copy.roughness = 1;
-              return copy;
-            });
-            if (!Array.isArray(object.material)) object.material = object.material[0];
-          });
-
-          // The textured model replaces the plain placeholder sphere only
-          // after its complete geometry has been normalized and centered.
-          globeGroup.remove(fallback);
-          globeGroup.add(root);
-        },
-        undefined,
-        error => console.warn("Detailed planet model unavailable; using procedural globe.", error)
-      );
+      // The sphere's own Earth texture is authoritative. Do not overlay the
+      // optional GLB model: its separate materials were hiding the surface map.
 
       const starGeo = new THREE.BufferGeometry();
       const starPos = [];
