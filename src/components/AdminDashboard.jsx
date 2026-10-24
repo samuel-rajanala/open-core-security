@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabase";
 import ChallengeManager from "./ChallengeManager.jsx";
-import { ShieldCheck, Users, Inbox, RefreshCw, Search, AlertCircle } from "lucide-react";
+import { ShieldCheck, Users, Inbox, RefreshCw, Search, AlertCircle, Trophy } from "lucide-react";
 
 export default function AdminDashboard() {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
   const [members, setMembers] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [scoring, setScoring] = useState(null);
   const [tab, setTab] = useState("overview");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
@@ -43,11 +44,13 @@ export default function AdminDashboard() {
         supabase.from("contact_messages").select("id, name, email, subject, message, created_at").order("created_at", { ascending: false }).limit(100)
       ]);
       if (!alive) return;
-      if (memberResult.error || messageResult.error) {
-        setError(memberResult.error?.message || messageResult.error?.message || "Could not load admin data.");
+      const scoringResult = await supabase.rpc("get_admin_scoring_data");
+      if (memberResult.error || messageResult.error || scoringResult.error) {
+        setError(memberResult.error?.message || messageResult.error?.message || scoringResult.error?.message || "Could not load admin data.");
       } else {
         setMembers(memberResult.data || []);
         setMessages(messageResult.data || []);
+        setScoring(scoringResult.data || null);
       }
       setLoading(false);
     }
@@ -81,6 +84,7 @@ export default function AdminDashboard() {
           <button className={tab === "members" ? "active" : ""} onClick={() => setTab("members")}>Members ({members.length})</button>
           <button className={tab === "inbox" ? "active" : ""} onClick={() => setTab("inbox")}>Inbox ({messages.length})</button>
           <button className={tab === "challenges" ? "active" : ""} onClick={() => setTab("challenges")}>Challenges</button>
+          <button className={tab === "scoring" ? "active" : ""} onClick={() => setTab("scoring")}>Scoring</button>
         </div>
         {tab === "overview" && <div className="admin-columns">
           <article className="admin-panel"><h3>Recent members</h3>{members.slice(0,5).map(m=><div className="admin-list-row" key={m.id}><span>{m.display_name || "Unnamed member"}<small>{m.id}</small></span><b>{m.role}</b></div>)}{!members.length && <p>No profiles found.</p>}</article>
@@ -88,6 +92,7 @@ export default function AdminDashboard() {
         </div>}
         {tab === "members" && <article className="admin-panel"><div className="admin-panel-head"><h3>Member directory</h3><label className="admin-search"><Search size={15}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search name, ID, or role"/></label></div><div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Display name</th><th>Role</th><th>Joined</th><th>User ID</th></tr></thead><tbody>{filteredMembers.map(m=><tr key={m.id}><td>{m.display_name}</td><td><span className={m.role === "admin" ? "admin-role" : "member-role"}>{m.role}</span></td><td>{new Date(m.created_at).toLocaleDateString()}</td><td><code>{m.id}</code></td></tr>)}</tbody></table>{!filteredMembers.length && <p>No matching members.</p>}</div></article>}
         {tab === "challenges" && <ChallengeManager />}
+        {tab === "scoring" && <div className="admin-scoring"><div className="admin-stats"><article><Trophy/><small>SUCCESSFUL SOLVES</small><strong>{scoring?.correct_submissions ?? 0}</strong></article><article><Users/><small>TEAM MEMBERSHIPS</small><strong>{scoring?.team_memberships ?? 0}</strong></article><article><Inbox/><small>TOTAL ATTEMPTS</small><strong>{scoring?.attempts ?? 0}</strong></article></div><div className="admin-columns"><article className="admin-panel"><h3>Individual standings</h3><div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Participant</th><th>Points</th><th>Solves</th></tr></thead><tbody>{(scoring?.individuals || []).map(p=><tr key={p.user_id}><td>{p.display_name}</td><td>{p.points}</td><td>{p.solves}</td></tr>)}</tbody></table></div></article><article className="admin-panel"><h3>Team standings</h3><div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Team</th><th>Points</th><th>Solves</th><th>Members</th></tr></thead><tbody>{(scoring?.teams || []).map(t=><tr key={t.team_id}><td>{t.team_name}</td><td>{t.points}</td><td>{t.solves}</td><td>{t.member_count}</td></tr>)}</tbody></table></div></article></div></div> }
         {tab === "inbox" && <div className="admin-inbox">{messages.map(m=><article className="admin-panel message-card" key={m.id}><div className="message-meta"><span>{m.name} · <a href={`mailto:${encodeURIComponent(m.email)}`}>{m.email}</a></span><time>{new Date(m.created_at).toLocaleString()}</time></div><h3>{m.subject}</h3><p>{m.message}</p></article>)}{!messages.length && <article className="admin-panel">Your inbox is empty.</article>}</div>}
         <p className="admin-footnote">Member management is read-only in this release. Role changes and account deletion are intentionally not exposed in the browser.</p>
       </>}

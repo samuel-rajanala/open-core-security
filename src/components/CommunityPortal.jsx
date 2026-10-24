@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { LogIn, LogOut, UserPlus, ShieldCheck, Send, RefreshCw } from "lucide-react";
+import TeamHub from "./TeamHub.jsx";
 
 export default function CommunityPortal() {
   const [session, setSession] = useState(null);
@@ -128,6 +129,7 @@ export default function CommunityPortal() {
           </form>
         </div>
       </div>}
+      {session && <TeamHub />}
       {notice && <p className="portal-notice" role="status">{notice}</p>}
       <p className="portal-footnote">Use a unique password. Open Core Security will never ask you to share your password or authentication codes.</p>
     </div>
